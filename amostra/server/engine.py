@@ -9,6 +9,9 @@ from pymongo.errors import PyMongoError
 from pymongo import DESCENDING
 from .utils import compose_err_msg
 
+import os
+
+HACK = True
 
 def db_connect(database, mongo_host, mongo_port, mongo_user=None,
                mongo_pwd=None, auth=False):
@@ -31,45 +34,52 @@ def db_connect(database, mongo_host, mongo_port, mongo_user=None,
     multiple clients and makes no difference for a single client compared
     to pymongo
     """
-    if auth:
+    
+    # TODO: Temporarily hard code mongo client.
+    if HACK:
+        client = pymongo.MongoClient(f"mongodb://fmx_write:{os.environ['MONGO_PASSWORD_FMX']}@mongo1.nsls2.bnl.gov,mongo2.nsls2.bnl.gov,mongo3.nsls2.bnl.gov/?authSource=admin")
+
+        database = client['fmx-amostra']
+    elif auth:
         uri = 'mongodb://{0}:{1}@{2}:{3}/'.format(mongo_user,
                                                   mongo_pwd,
                                                   mongo_host,
                                                   mongo_port)
         client = pymongo.MongoClient(uri)
+        database = client[database]
     else:
         try:
             client = pymongo.MongoClient(host=mongo_host, port=mongo_port)
         except pymongo.errors.ConnectionFailure:
             raise utils.AmostraException("Unable to connect to MongoDB server...")
-    database = client[database]
-    try:
-        database.sample.create_index([('uid', DESCENDING)],
-                                     unique=True, background=True)
-        database.sample.create_index([('time', DESCENDING),
-                                     ('name', DESCENDING)],
-                                     unique=False, background=True)
-        database.sample.create_index([('container', DESCENDING)],
-                                     unique=False, sparse=True)
-        database.sample.create_index([('uid', DESCENDING)],
-                                     unique=True, background=True)
-        database.sample.create_index([('time', DESCENDING)],
-                                     unique=False, background=True)
-        database.request.create_index([('uid', DESCENDING)],
-                                      unique=True, background=True)
-        database.request.create_index([('time', DESCENDING)],
-                                      unique=False, background=True)
-        database.request.create_index([('sample', DESCENDING)],
-                                      unique=False, background=True, sparse=True)
-        database.container.create_index([('uid', DESCENDING)],
-                                        unique=True, background=True)
-        database.container.create_index([('time', DESCENDING)],
-                                        unique=False, background=True)
-        database.container.create_index([('container', DESCENDING)],
-                                        unique=False, background=True,
-                                        sparse=True)
-    except PyMongoError:
-        raise compose_err_msg(500, 'Not connected to Mongo daemon')
+        database = client[database]
+        try:
+            database.sample.create_index([('uid', DESCENDING)],
+                                         unique=True, background=True)
+            database.sample.create_index([('time', DESCENDING),
+                                         ('name', DESCENDING)],
+                                         unique=False, background=True)
+            database.sample.create_index([('container', DESCENDING)],
+                                         unique=False, sparse=True)
+            database.sample.create_index([('uid', DESCENDING)],
+                                         unique=True, background=True)
+            database.sample.create_index([('time', DESCENDING)],
+                                         unique=False, background=True)
+            database.request.create_index([('uid', DESCENDING)],
+                                          unique=True, background=True)
+            database.request.create_index([('time', DESCENDING)],
+                                          unique=False, background=True)
+            database.request.create_index([('sample', DESCENDING)],
+                                          unique=False, background=True, sparse=True)
+            database.container.create_index([('uid', DESCENDING)],
+                                            unique=True, background=True)
+            database.container.create_index([('time', DESCENDING)],
+                                            unique=False, background=True)
+            database.container.create_index([('container', DESCENDING)],
+                                            unique=False, background=True,
+                                            sparse=True)
+        except PyMongoError:
+            raise compose_err_msg(500, 'Not connected to Mongo daemon')
     return database
 
 
