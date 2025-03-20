@@ -21,6 +21,7 @@ testing_config = {
     "mongo_uri": "mongodb://localhost:27017",
     "host": "localhost",
     "port": 7770,
+    "use_ssl": False,
     "timezone": "US/Eastern",
     "mongo_user": "tom",
     "mongo_pwd": "jerry",
@@ -53,7 +54,7 @@ def amostra_server():
 
 @pytest.fixture(scope="function")
 def amostra_client():
-    conn = AmostraClient(host=testing_config["host"], port=testing_config["port"])
+    conn = AmostraClient(host=testing_config["host"], port=testing_config["port"], use_ssl=testing_config["use_ssl"])
     return conn
 
 
