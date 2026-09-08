@@ -248,8 +248,6 @@ class SampleReference(object):
         scheme = "https" if self.use_ssl else "http"
         if self.port is None or (self.use_ssl and self.port == 443):
             return f"{scheme}://{self.host}/"
-        elif self.port is None:
-            return f"{scheme}://{self.host}/"
         return f"{scheme}://{self.host}:{self.port}/"
 
     @property
