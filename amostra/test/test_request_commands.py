@@ -1,7 +1,23 @@
 import time
+import pytest
 from amostra.client.api import RequestReference
 from amostra.testing import TESTING_CONFIG
 from uuid import uuid4
+
+
+@pytest.mark.parametrize(
+    "port, use_ssl, expected",
+    [
+        (7770, False, "http://localhost:7770/"),
+        (None, True, "https://localhost/"),
+        (443, True, "https://localhost/"),
+        (8443, True, "https://localhost:8443/"),
+    ],
+)
+def test_request_server_path(port, use_ssl, expected):
+    reference = RequestReference(host="localhost", port=port, use_ssl=use_ssl)
+
+    assert reference._server_path == expected
 
 
 def test_request_create(amostra_server, amostra_client):
