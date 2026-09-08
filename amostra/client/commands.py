@@ -225,7 +225,7 @@ class AmostraClient:
 class SampleReference(object):
     """Reference implementation of generic sample manager"""
     def __init__(self, host=conf.conn_config['host'],
-                 port=conf.conn_config['port'], use_ssl = conf.conn_config['use_ssl']):
+                 port=conf.conn_config['port'], use_ssl=conf.conn_config['use_ssl']):
         """Constructor.
 
         Parameters
