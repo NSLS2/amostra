@@ -8,7 +8,7 @@ on:
 
 jobs:
   build:
-    name: Test conftrack with Python ${{ matrix.python-version }} (${{ matrix.dependencies }})
+    name: Test amostra with Python ${{ matrix.python-version }} (${{ matrix.dependencies }})
     runs-on: ubuntu-latest
     strategy:
       matrix:
