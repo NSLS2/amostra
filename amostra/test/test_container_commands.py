@@ -19,6 +19,7 @@ def test_container_constructor():
     "port, use_ssl, expected",
     [
         (7770, False, "http://localhost:7770/"),
+        (None, False, "http://localhost/"),
         (None, True, "https://localhost/"),
         (443, True, "https://localhost/"),
         (8443, True, "https://localhost:8443/"),
