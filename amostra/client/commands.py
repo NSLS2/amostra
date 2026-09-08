@@ -385,9 +385,10 @@ class RequestReference(object):
     @property
     def _server_path(self):
         """URL to the Amostra server"""
-        if self.use_ssl:  # ignore port if using SSL
-            return f"https://{self.host}/"
-        return 'http://{}:{}/' .format(self.host, self.port)
+        scheme = "https" if self.use_ssl else "http"
+        if self.use_ssl and (self.port is None or self.port == 443):
+            return f"{scheme}://{self.host}/"
+        return f"{scheme}://{self.host}:{self.port}/"
 
     @property
     def _req_url(self):
@@ -502,9 +503,10 @@ class ContainerReference(object):
     @property
     def _server_path(self):
         """URL to the Amostra server"""
-        if self.use_ssl:  # ignore port if using SSL
-            return f"https://{self.host}/"
-        return 'http://{}:{}/' .format(self.host, self.port)
+        scheme = "https" if self.use_ssl else "http"
+        if self.use_ssl and (self.port is None or self.port == 443):
+            return f"{scheme}://{self.host}/"
+        return f"{scheme}://{self.host}:{self.port}/"
 
     @property
     def _cont_url(self):
