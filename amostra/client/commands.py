@@ -10,7 +10,7 @@ class AmostraException(Exception):
 
 
 class AmostraClient:
-    def __init__(self, host, port):
+    def __init__(self, host, port, use_ssl=False):
         """ Simplified client for Sample, Request, and Container
 
         Parameters
@@ -19,27 +19,33 @@ class AmostraClient:
             Machine name/address for Amostra server
         port: int, optional
             Port Amostra server is initiated on
+        use_ssl: boolean, optional
+            Use SSL
         """
         self.host = host
         self.port = port
+        self.use_ssl = use_ssl
 
     @property
     def _sample_client(self):
         """ Connection pool for Sample related tasks."""
         return SampleReference(host=self.host,
-                               port=self.port)
+                               port=self.port,
+                               use_ssl=self.use_ssl)
 
     @property
     def _container_client(self):
         """Connection pool for Container related tasks."""
         return ContainerReference(host=self.host,
-                                  port=self.port)
+                                  port=self.port,
+                                  use_ssl=self.use_ssl)
 
     @property
     def _request_client(self):
         """Connection pool for Request related tasks."""
         return RequestReference(host=self.host,
-                                port=self.port)
+                                port=self.port,
+                                use_ssl=self.use_ssl)
 
     def create_sample(self, name, time=None, uid=None, container=None,
                        **kwargs):
@@ -219,7 +225,7 @@ class AmostraClient:
 class SampleReference(object):
     """Reference implementation of generic sample manager"""
     def __init__(self, host=conf.conn_config['host'],
-                 port=conf.conn_config['port']):
+                 port=conf.conn_config['port'], use_ssl=conf.conn_config['use_ssl']):
         """Constructor.
 
         Parameters
@@ -228,15 +234,21 @@ class SampleReference(object):
             Machine name/address for Amostra server
         port: int, optional
             Port Amostra server is initiated on
+        use_ssl: boolean, optional
+            Use SSL (https)
 
         """
         self.host = host
         self.port = port
+        self.use_ssl = use_ssl
 
     @property
     def _server_path(self):
         """URL to the Amostra server"""
-        return 'http://{}:{}/' .format(self.host, self.port)
+        scheme = "https" if self.use_ssl else "http"
+        if self.port is None or (self.use_ssl and self.port == 443):
+            return f"{scheme}://{self.host}/"
+        return f"{scheme}://{self.host}:{self.port}/"
 
     @property
     def _samp_url(self):
@@ -353,7 +365,7 @@ class SampleReference(object):
 
 class RequestReference(object):
     """Reference implementation of generic request"""
-    def __init__(self, host=conf.conn_config['host'], port=conf.conn_config['port']):
+    def __init__(self, host=conf.conn_config['host'], port=conf.conn_config['port'], use_ssl=conf.conn_config['use_ssl']):
         """Constructor
 
         Parameters
@@ -362,15 +374,21 @@ class RequestReference(object):
             Machine name/address for amostra server
         port: int, optional
             Port amostra server is initiated on
+        use_ssl: boolean, optional
+            Use SSL
 
         """
         self.host = host
         self.port = port
+        self.use_ssl = use_ssl
 
     @property
     def _server_path(self):
         """URL to the Amostra server"""
-        return 'http://{}:{}/' .format(self.host, self.port)
+        scheme = "https" if self.use_ssl else "http"
+        if self.port is None or (self.use_ssl and self.port == 443):
+            return f"{scheme}://{self.host}/"
+        return f"{scheme}://{self.host}:{self.port}/"
 
     @property
     def _req_url(self):
@@ -474,17 +492,21 @@ class RequestReference(object):
 
 class ContainerReference(object):
     """Reference implementation of generic container"""
-    def __init__(self, host=conf.conn_config['host'], port=conf.conn_config['port']):
+    def __init__(self, host=conf.conn_config['host'], port=conf.conn_config['port'], use_ssl=conf.conn_config['use_ssl']):
         """Handles connection configuration to the service backend.
         Either initiate with a request or use purely as a client for requests.
         """
         self.port = port
         self.host = host
+        self.use_ssl = use_ssl
 
     @property
     def _server_path(self):
         """URL to the Amostra server"""
-        return 'http://{}:{}/' .format(self.host, self.port)
+        scheme = "https" if self.use_ssl else "http"
+        if self.port is None or (self.use_ssl and self.port == 443):
+            return f"{scheme}://{self.host}/"
+        return f"{scheme}://{self.host}:{self.port}/"
 
     @property
     def _cont_url(self):

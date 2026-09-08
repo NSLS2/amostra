@@ -15,6 +15,22 @@ def test_container_constructor():
     s2 = ContainerReference()
 
 
+@pytest.mark.parametrize(
+    "port, use_ssl, expected",
+    [
+        (7770, False, "http://localhost:7770/"),
+        (None, False, "http://localhost/"),
+        (None, True, "https://localhost/"),
+        (443, True, "https://localhost/"),
+        (8443, True, "https://localhost:8443/"),
+    ],
+)
+def test_container_server_path(port, use_ssl, expected):
+    reference = ContainerReference(host="localhost", port=port, use_ssl=use_ssl)
+
+    assert reference._server_path == expected
+
+
 def test_container_create(amostra_server, amostra_client):
     ast_cont = {'name': 'obelix', "dog": 'hidefix', 'time': ttime.time(),
                 'container': 'gauls', 'uid': str(uuid.uuid4())}

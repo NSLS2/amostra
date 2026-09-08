@@ -16,6 +16,21 @@ def test_sample_constructor():
     s2 = SampleReference()
 
 
+@pytest.mark.parametrize(
+    "port, use_ssl, expected",
+    [
+        (7770, False, "http://localhost:7770/"),
+        (None, True, "https://localhost/"),
+        (443, True, "https://localhost/"),
+        (8443, True, "https://localhost:8443/"),
+    ],
+)
+def test_sample_server_path(port, use_ssl, expected):
+    reference = SampleReference(host="localhost", port=port, use_ssl=use_ssl)
+
+    assert reference._server_path == expected
+
+
 def test_connection_switch(amostra_server, amostra_client):
     amostra_client.host = 'caesar'
     pytest.raises(RequestException, amostra_client._sample_client.create, 'asterix')
