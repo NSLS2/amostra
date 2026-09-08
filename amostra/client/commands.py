@@ -386,9 +386,7 @@ class RequestReference(object):
     def _server_path(self):
         """URL to the Amostra server"""
         scheme = "https" if self.use_ssl else "http"
-        if self.use_ssl and (self.port is None or self.port == 443):
-            return f"{scheme}://{self.host}/"
-        elif self.port is None:
+        if self.port is None or (self.use_ssl and self.port == 443):
             return f"{scheme}://{self.host}/"
         return f"{scheme}://{self.host}:{self.port}/"
 
@@ -506,9 +504,7 @@ class ContainerReference(object):
     def _server_path(self):
         """URL to the Amostra server"""
         scheme = "https" if self.use_ssl else "http"
-        if self.use_ssl and (self.port is None or self.port == 443):
-            return f"{scheme}://{self.host}/"
-        elif self.port is None:
+        if self.port is None or (self.use_ssl and self.port == 443):
             return f"{scheme}://{self.host}/"
         return f"{scheme}://{self.host}:{self.port}/"
 
